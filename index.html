@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico PAEI · Orange143</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #F59E0B;
+    --orange-dark: #D97706;
+    --orange-light: #FEF3C7;
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.08);
+    --text: #1A1A18;
+    --text-2: #6B6B60;
+    --text-3: #9B9B90;
+    --P: #F59E0B;
+    --A: #3B82F6;
+    --E: #10B981;
+    --I: #8B5CF6;
+    --radius: 14px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .hidden { display: none !important; }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-badge {
+    width: 36px; height: 36px;
+    background: var(--orange);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 13px; color: #fff; letter-spacing: -0.5px;
+  }
+  .logo-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .logo-tag { font-size: 11px; color: var(--text-3); }
+  .header-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .header-btn:hover { background: var(--bg); color: var(--text); }
+
+  /* LAYOUT */
+  .container { max-width: 680px; margin: 0 auto; padding: 32px 20px 60px; }
+
+  /* SCREENS */
+  .screen { animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* HOME */
+  .hero { text-align: center; padding: 48px 0 32px; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--orange-light);
+    color: var(--orange-dark);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 38px;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .hero p { font-size: 15px; color: var(--text-2); max-width: 420px; margin: 0 auto 32px; }
+
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .info-card .num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--orange); }
+  .info-card .lbl { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+  .score-guide {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+  .score-guide h3 { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--text-2); }
+  .score-row { display: flex; gap: 8px; }
+  .score-pill {
+    flex: 1; text-align: center; padding: 10px 8px;
+    border-radius: 10px; border: 1px solid var(--border);
+  }
+  .score-pill .sv { font-size: 22px; font-weight: 600; }
+  .score-pill .sl { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .s4 { background: #FEF3C7; } .s4 .sv { color: #92400E; }
+  .s3 { background: #DBEAFE; } .s3 .sv { color: #1E40AF; }
+  .s2 { background: #D1FAE5; } .s2 .sv { color: #065F46; }
+  .s1 { background: #F3F4F6; } .s1 .sv { color: #374151; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .btn-primary { background: var(--orange); color: #fff; width: 100%; }
+  .btn-primary:hover { background: var(--orange-dark); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    width: 100%;
+    margin-top: 10px;
+  }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn-small {
+    padding: 8px 16px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  /* FORM */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .form-card h2 { font-family: 'DM Serif Display', serif; font-size: 26px; margin-bottom: 4px; }
+  .form-card .sub { font-size: 14px; color: var(--text-3); margin-bottom: 24px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; letter-spacing: 0.3px; }
+  .field input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.15s;
+  }
+  .field input:focus { outline: none; border-color: var(--orange); background: #fff; }
+  .field input::placeholder { color: var(--text-3); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .err-msg { font-size: 12px; color: #DC2626; margin-bottom: 12px; display: none; }
+
+  /* QUIZ */
+  .quiz-header { margin-bottom: 20px; }
+  .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .q-counter { font-size: 13px; color: var(--text-3); }
+  .dim-badge {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    padding: 3px 10px; border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .dim-SOU { background: #FEF3C7; color: #92400E; }
+  .dim-QUERO { background: #DBEAFE; color: #1E40AF; }
+  .dim-DEVO { background: #D1FAE5; color: #065F46; }
+  .progress-track {
+    height: 3px; background: var(--border);
+    border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--orange);
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .q-text { font-size: 17px; font-weight: 500; margin-bottom: 20px; line-height: 1.5; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    transition: border-color 0.15s;
+  }
+  .opt-row.scored { border-color: var(--orange); background: #FFFBF0; }
+  .opt-letter { font-size: 12px; color: var(--text-3); width: 14px; flex-shrink: 0; font-weight: 600; }
+  .opt-text { flex: 1; font-size: 14px; color: var(--text); line-height: 1.4; }
+  .score-btns { display: flex; gap: 4px; }
+  .sbtn {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    color: var(--text-2);
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sbtn:hover { background: var(--orange-light); border-color: var(--orange); color: var(--orange-dark); }
+  .sbtn.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+  .q-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+  .total-indicator { font-size: 12px; color: var(--text-3); }
+  .total-ok { color: #059669; font-weight: 600; }
+  .total-err { color: #DC2626; }
+  .nav-btns { display: flex; gap: 8px; }
+
+  /* RESULT */
+  .result-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .result-name { font-size: 13px; color: var(--text-3); margin-bottom: 4px; }
+  .dom-profile {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px;
+  }
+  .dom-letter { font-family: 'DM Serif Display', serif; font-size: 64px; line-height: 1; }
+  .dom-info .dom-full { font-size: 20px; font-weight: 600; }
+  .dom-info .dom-desc { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+
+  .dim-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+  .dim-card {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid var(--border);
+  }
+  .dim-card .dc-title { font-size: 11px; font-weight: 600; color: var(--text-3); margin-bottom: 10px; letter-spacing: 0.5px; }
+  .bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+  .bar-lbl { font-size: 11px; font-weight: 600; width: 12px; }
+  .bar-bg { flex: 1; height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .bar-val { font-size: 11px; color: var(--text-3); width: 20px; text-align: right; }
+
+  .analysis-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .analysis-card h3 { font-size: 14px; font-weight: 600; color: var(--text-2); margin-bottom: 16px; }
+  .analysis-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr 1fr 50px 80px;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .analysis-row:last-child { border-bottom: none; }
+  .analysis-head { font-size: 11px; font-weight: 600; color: var(--text-3); letter-spacing: 0.5px; }
+  .tag {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    display: inline-block;
+  }
+  .tag-manter { background: #D1FAE5; color: #065F46; }
+  .tag-aumentar { background: #DBEAFE; color: #1E40AF; }
+  .tag-diminuir { background: #FEE2E2; color: #991B1B; }
+  .tag-ciente { background: #FEF3C7; color: #92400E; }
+  .gap-warn { color: #DC2626; font-weight: 600; }
+
+  /* DASHBOARD */
+  .dash-tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .tab {
+    padding: 7px 16px; border-radius: 8px; font-size: 13px;
+    cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text-2);
+    font-family: 'DM Sans', sans-serif; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .tab.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+  .search-inp {
+    width: 100%; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: 9px;
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    background: var(--surface); color: var(--text);
+    margin-bottom: 16px;
+  }
+  .search-inp:focus { outline: none; border-color: var(--orange); }
+  .resp-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .resp-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .resp-name { font-size: 15px; font-weight: 600; }
+  .resp-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  .resp-badges { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+  .rbadge {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .rb-P { background: #FEF3C7; color: #92400E; }
+  .rb-A { background: #DBEAFE; color: #1E40AF; }
+  .rb-E { background: #D1FAE5; color: #065F46; }
+  .rb-I { background: #EDE9FE; color: #5B21B6; }
+  .rb-gap { background: #FEE2E2; color: #991B1B; }
+  .rb-dom { font-size: 12px; padding: 4px 12px; }
+  .empty { text-align: center; padding: 48px 0; color: var(--text-3); font-size: 14px; }
+  .loading { text-align: center; padding: 48px 0; color: var(--text-3); font-size: 14px; }
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--text-2); margin-bottom: 16px; }
+
+  @media (max-width: 500px) {
+    .info-grid { grid-template-columns: repeat(3,1fr); }
+    .row2 { grid-template-columns: 1fr; }
+    .dim-grid { grid-template-columns: 1fr; }
+    .analysis-row { grid-template-columns: 60px 1fr 1fr 1fr 40px 70px; font-size: 12px; }
+    .hero h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-badge">1/43</div>
+    <div>
+      <div class="logo-name">Orange143</div>
+      <div class="logo-tag">Diagnóstico PAEI · Adizes</div>
+    </div>
+  </div>
+  <button class="header-btn" onclick="showDash()">Painel</button>
+</header>
+
+<div class="container">
+
+  <!-- HOME -->
+  <div id="screen-home" class="screen">
+    <div class="hero">
+      <div class="hero-badge">Metodologia Adizes</div>
+      <h1>Descubra seu perfil PAEI</h1>
+      <p>30 questões para mapear como você lidera, decide e colabora — baseado no modelo de Ichak Adizes.</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="num">30</div><div class="lbl">questões</div></div>
+      <div class="info-card"><div class="num">~10</div><div class="lbl">minutos</div></div>
+      <div class="info-card"><div class="num">3</div><div class="lbl">dimensões</div></div>
+    </div>
+    <div class="score-guide">
+      <h3>Como pontuar cada questão</h3>
+      <div class="score-row">
+        <div class="score-pill s4"><div class="sv">4</div><div class="sl">mais eu</div></div>
+        <div class="score-pill s3"><div class="sv">3</div><div class="sl">bastante</div></div>
+        <div class="score-pill s2"><div class="sv">2</div><div class="sl">um pouco</div></div>
+        <div class="score-pill s1"><div class="sv">1</div><div class="sl">menos eu</div></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-3);margin-top:10px">Distribua sem repetir pontuações. Total de 10 por questão.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goIdent()">Iniciar diagnóstico</button>
+  </div>
+
+  <!-- IDENTIFICATION -->
+  <div id="screen-ident" class="screen hidden">
+    <div class="form-card">
+      <h2>Seus dados</h2>
+      <p class="sub">* campos obrigatórios</p>
+      <div class="field"><label>Nome *</label><input id="f-nome" type="text" placeholder="Nome completo"></div>
+      <div class="field"><label>Telefone *</label><input id="f-tel" type="tel" placeholder="(11) 99999-9999"></div>
+      <div class="row2">
+        <div class="field"><label>Empresa</label><input id="f-empresa" type="text" placeholder="Nome da empresa"></div>
+        <div class="field"><label>Cargo</label><input id="f-cargo" type="text" placeholder="Seu cargo"></div>
+      </div>
+      <div class="field"><label>E-mail</label><input id="f-email" type="email" placeholder="seu@email.com"></div>
+      <div class="err-msg" id="ident-err">Preencha nome e telefone para continuar.</div>
+      <button class="btn btn-primary" onclick="startQuiz()">Começar questionário</button>
+      <button class="btn btn-secondary" onclick="show('screen-home')">Voltar</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="screen hidden">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <span class="q-counter" id="q-counter">Questão 1 de 30</span>
+        <span class="dim-badge" id="q-dim"></span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="q-progress" style="width:3%"></div></div>
+    </div>
+    <div class="q-card">
+      <p class="q-text" id="q-text"></p>
+      <div class="options" id="q-options"></div>
+      <div class="q-footer">
+        <span class="total-indicator" id="q-total"></span>
+        <div class="nav-btns">
+          <button class="btn btn-secondary btn-small" id="btn-prev" onclick="prevQ()">Voltar</button>
+          <button class="btn btn-primary btn-small" id="btn-next" onclick="nextQ()">Próxima</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result" class="screen hidden">
+    <div class="result-hero">
+      <div class="result-name" id="res-name"></div>
+      <div class="dom-profile">
+        <div class="dom-letter" id="dom-letter"></div>
+        <div class="dom-info">
+          <div class="dom-full" id="dom-full"></div>
+          <div class="dom-desc" id="dom-desc"></div>
+        </div>
+      </div>
+      <div class="dim-grid" id="dim-grid"></div>
+    </div>
+    <div class="analysis-card">
+      <h3>Análise SOU × QUERO × DEVO</h3>
+      <div class="analysis-row analysis-head">
+        <div>Papel</div><div>SOU</div><div>QUERO</div><div>DEVO</div><div>Gap</div><div>Ação</div>
+      </div>
+      <div id="analysis-rows"></div>
+    </div>
+    <button class="btn btn-primary" onclick="goHome()">Novo diagnóstico</button>
+    <button class="btn btn-secondary" onclick="showDash()">Ver painel de resultados</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="screen-dash" class="screen hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:26px">Painel de resultados</h2>
+        <p style="font-size:13px;color:var(--text-3)" id="dash-count"></p>
+      </div>
+      <button class="btn btn-secondary btn-small" onclick="goHome()">Voltar</button>
+    </div>
+    <div class="dash-tabs">
+      <button class="tab active" onclick="switchTab('lista')">Respondentes</button>
+      <button class="tab" onclick="switchTab('empresa')">Por empresa</button>
+      <button class="tab" onclick="switchTab('graficos')">Gráficos</button>
+    </div>
+    <div id="tab-lista">
+      <input class="search-inp" placeholder="Buscar por nome, empresa ou cargo..." oninput="filterList(this.value)">
+      <div id="resp-list"></div>
+    </div>
+    <div id="tab-empresa" class="hidden"><div id="empresa-list"></div></div>
+    <div id="tab-graficos" class="hidden">
+      <div class="chart-wrap"><div class="chart-title">Distribuição de perfis dominantes</div><div style="position:relative;height:220px"><canvas id="chartDist" role="img" aria-label="Perfis dominantes PAEI">Distribuição P A E I.</canvas></div></div>
+      <div class="chart-wrap"><div class="chart-title">Média SOU × QUERO × DEVO por papel</div><div style="position:relative;height:220px"><canvas id="chartAvg" role="img" aria-label="Média por dimensão">Médias por papel e dimensão.</canvas></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAuYSZNZeW0XK-V-yyI36TRfpcXor65W9g",
+    authDomain: "paei-org143.firebaseapp.com",
+    projectId: "paei-org143",
+    storageBucket: "paei-org143.firebasestorage.app",
+    messagingSenderId: "527904758045",
+    appId: "1:527904758045:web:16bb9404c83c40c83ba9f4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window._saveResponse = async (data) => {
+    try {
+      await addDoc(collection(db, "paei_responses"), { ...data, createdAt: new Date() });
+    } catch(e) { console.error("Erro ao salvar:", e); }
+  };
+
+  window._loadResponses = async () => {
+    try {
+      const q = query(collection(db, "paei_responses"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) { console.error("Erro ao carregar:", e); return []; }
+  };
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const QUESTIONS = [
+  {dim:'SOU',text:'O que meus colegas mais valorizam em mim é minha capacidade de:',opts:[{l:'a',t:'Fazer com que eles cooperem e colaborem.',r:'I'},{l:'b',t:'Entregar o trabalho proposto.',r:'P'},{l:'c',t:'Mudar as coisas.',r:'E'},{l:'d',t:'Trabalhar de forma organizada e sistemática.',r:'A'}]},
+  {dim:'QUERO',text:'Quero ser elogiado porque:',opts:[{l:'a',t:'Trabalho arduamente.',r:'P'},{l:'b',t:'Sou preciso.',r:'A'},{l:'c',t:'Entendo os outros.',r:'I'},{l:'d',t:'Sou criativo.',r:'E'}]},
+  {dim:'DEVO',text:'Os heróis em nossa organização são aqueles que:',opts:[{l:'a',t:'Seguem os padrões de qualidade definidos.',r:'A'},{l:'b',t:'Demonstram vontade e capacidade de entrega.',r:'P'},{l:'c',t:'Trazem boas e novas ideias.',r:'E'},{l:'d',t:'Trabalham bem com os outros.',r:'I'}]},
+  {dim:'SOU',text:'O que me distingue dos demais é que sou bom em:',opts:[{l:'a',t:'Concluir minhas tarefas.',r:'P'},{l:'b',t:'Planejar e estruturar o trabalho.',r:'A'},{l:'c',t:'Detectar novas oportunidades.',r:'E'},{l:'d',t:'Ouvir os outros.',r:'I'}]},
+  {dim:'DEVO',text:'A cultura da nossa organização é direcionada para que as pessoas:',opts:[{l:'a',t:'Sigam de forma sistemática os procedimentos internos.',r:'A'},{l:'b',t:'Cooperem e colaborem junto a outras áreas.',r:'I'},{l:'c',t:'Façam e entreguem o trabalho do dia a dia.',r:'P'},{l:'d',t:'Arrisquem-se e pensem em novas maneiras.',r:'E'}]},
+  {dim:'QUERO',text:'Se eu tivesse tempo livre no trabalho, gostaria de:',opts:[{l:'a',t:'Organizar e sistematizar minhas demandas.',r:'A'},{l:'b',t:'Finalizar demandas com alta qualidade.',r:'P'},{l:'c',t:'Desenvolver novos projetos e explorar oportunidades.',r:'E'},{l:'d',t:'Desenvolver melhores relacionamentos.',r:'I'}]},
+  {dim:'DEVO',text:'O mais importante em nossa operação diária é:',opts:[{l:'a',t:'Promover o trabalho em equipe entre departamentos.',r:'I'},{l:'b',t:'Estar na vanguarda do nosso segmento.',r:'E'},{l:'c',t:'Ter processos e sistemas que funcionem.',r:'A'},{l:'d',t:'Produzir e entregar nossas demandas.',r:'P'}]},
+  {dim:'SOU',text:'Meus colegas mais próximos me enxergam como uma pessoa:',opts:[{l:'a',t:'Agradável e fácil de trabalhar.',r:'I'},{l:'b',t:'Organizada e confiável.',r:'A'},{l:'c',t:'Criativa e com visão de futuro.',r:'E'},{l:'d',t:'Com alta capacidade de entrega.',r:'P'}]},
+  {dim:'QUERO',text:'Um trabalho ideal para mim permitiria que eu:',opts:[{l:'a',t:'Estivesse com pessoas que gosto.',r:'I'},{l:'b',t:'Fosse criativo e desenvolvesse minhas ideias.',r:'E'},{l:'c',t:'Me concentrasse em obter resultados expressivos.',r:'P'},{l:'d',t:'Estruturasse e organizasse meu trabalho.',r:'A'}]},
+  {dim:'DEVO',text:'Meu trabalho atual exige que eu:',opts:[{l:'a',t:'Trabalhe duro para entregar minhas demandas.',r:'P'},{l:'b',t:'Me relacione bem e promova bom clima.',r:'I'},{l:'c',t:'Garanta que as diretrizes sejam seguidas.',r:'A'},{l:'d',t:'Mude com frequência o que precisa ser desenvolvido.',r:'E'}]},
+  {dim:'SOU',text:'O que considero mais importante ao tomar uma decisão é:',opts:[{l:'a',t:'Obter resultados de forma rápida.',r:'P'},{l:'b',t:'Minimizar os riscos envolvidos.',r:'A'},{l:'c',t:'Encontrar uma solução adequada para todos.',r:'I'},{l:'d',t:'Mapear soluções novas e inovadoras.',r:'E'}]},
+  {dim:'QUERO',text:'Desejo que os outros enxerguem minha capacidade de:',opts:[{l:'a',t:'Produzir e gerar resultados.',r:'P'},{l:'b',t:'Relacionar-me bem com os outros.',r:'I'},{l:'c',t:'Trabalhar de forma organizada e sistemática.',r:'A'},{l:'d',t:'Pensar de forma inovadora.',r:'E'}]},
+  {dim:'DEVO',text:'Meu líder espera que eu domine:',opts:[{l:'a',t:'As regras e procedimentos operacionais.',r:'A'},{l:'b',t:'As artimanhas para entregar trabalho com qualidade.',r:'P'},{l:'c',t:'O futuro e as tendências do segmento.',r:'E'},{l:'d',t:'A arte de fazer diferentes pessoas trabalharem juntas.',r:'I'}]},
+  {dim:'SOU',text:'Um dia bom para mim é quando:',opts:[{l:'a',t:'Fui capaz de trabalhar sem interrupção.',r:'P'},{l:'b',t:'Minhas novas ideias ganharam aceitação.',r:'E'},{l:'c',t:'Cumpri todas as diretrizes definidas.',r:'A'},{l:'d',t:'Saímos como uma equipe alinhada.',r:'I'}]},
+  {dim:'QUERO',text:'No trabalho, preciso sentir que estou:',opts:[{l:'a',t:'Sendo bem quisto pelo time.',r:'I'},{l:'b',t:'No controle das situações.',r:'A'},{l:'c',t:'Usando minha criatividade.',r:'E'},{l:'d',t:'Progredindo e entregando minhas demandas.',r:'P'}]},
+  {dim:'QUERO',text:'Ao considerar um novo emprego, o mais importante é:',opts:[{l:'a',t:'Oportunidades de correr riscos e ser criativo.',r:'E'},{l:'b',t:'Estabilidade e segurança.',r:'A'},{l:'c',t:'Altas exigências de performance.',r:'P'},{l:'d',t:'Ambiente onde trabalho em equipe seja valorizado.',r:'I'}]},
+  {dim:'DEVO',text:'O foco do meu trabalho atual é:',opts:[{l:'a',t:'Desenvolver pessoas e gerar bom clima.',r:'I'},{l:'b',t:'Garantir que a demanda diária será realizada.',r:'P'},{l:'c',t:'Arriscar-me para criar novos serviços.',r:'E'},{l:'d',t:'Garantir que regras e sistemas sejam respeitados.',r:'A'}]},
+  {dim:'SOU',text:'Quando estou trabalhando, sou bom em:',opts:[{l:'a',t:'Identificar novas maneiras de atender demandas.',r:'E'},{l:'b',t:'Garantir que as coisas sejam feitas corretamente.',r:'A'},{l:'c',t:'Entregar resultados.',r:'P'},{l:'d',t:'Manter um ambiente de trabalho colaborativo.',r:'I'}]},
+  {dim:'SOU',text:'O principal motivo para adiar uma ação importante é quando:',opts:[{l:'a',t:'Não possuo informações suficientes.',r:'A'},{l:'b',t:'Não tenho consenso de outras pessoas.',r:'I'},{l:'c',t:'Sinto que irá afetar outras demandas.',r:'P'},{l:'d',t:'Não identifico algo inovador para tratar a questão.',r:'E'}]},
+  {dim:'DEVO',text:'O aspecto mais importante do meu trabalho é:',opts:[{l:'a',t:'Estabelecer processos que garantam uso eficiente dos recursos.',r:'A'},{l:'b',t:'Entregar meu trabalho dentro do prazo e qualidade.',r:'P'},{l:'c',t:'Garantir que minha organização permaneça na vanguarda.',r:'E'},{l:'d',t:'Motivar meus colegas no trabalho deles.',r:'I'}]},
+  {dim:'QUERO',text:'O tipo de oportunidade profissional que aprecio possui:',opts:[{l:'a',t:'Escopos e desafios em constante mudança.',r:'E'},{l:'b',t:'Condições de trabalho bem estruturadas.',r:'A'},{l:'c',t:'Oportunidades de me relacionar e bom clima.',r:'I'},{l:'d',t:'Grandes desafios e oportunidades de destaque.',r:'P'}]},
+  {dim:'SOU',text:'O tipo de atividade que me dá maior satisfação requer:',opts:[{l:'a',t:'Planejamento sistemático.',r:'A'},{l:'b',t:'Trabalho em equipe.',r:'I'},{l:'c',t:'Trabalho duro.',r:'P'},{l:'d',t:'Criatividade e risco.',r:'E'}]},
+  {dim:'DEVO',text:'Os líderes de minha organização são elogiados por:',opts:[{l:'a',t:'Trabalhar arduamente.',r:'P'},{l:'b',t:'Assumir riscos e identificar novas formas.',r:'E'},{l:'c',t:'Planejar e organizar o trabalho.',r:'A'},{l:'d',t:'Fazer pessoas trabalharem de forma colaborativa.',r:'I'}]},
+  {dim:'QUERO',text:'Quero ser visto como alguém que:',opts:[{l:'a',t:'Gera novas ideias.',r:'E'},{l:'b',t:'Possui alta performance.',r:'P'},{l:'c',t:'Forma times colaborativos.',r:'I'},{l:'d',t:'É confiável e preciso.',r:'A'}]},
+  {dim:'DEVO',text:'Meu trabalho exige que eu:',opts:[{l:'a',t:'Trabalhe rapidamente e de maneira ordenada.',r:'P'},{l:'b',t:'Inspire o compromisso dos meus colegas.',r:'I'},{l:'c',t:'Encontre novos métodos de trabalho.',r:'E'},{l:'d',t:'Trabalhe de forma cuidadosa e sistemática.',r:'A'}]},
+  {dim:'SOU',text:'Os tipos de tarefas que eu gosto são aquelas que:',opts:[{l:'a',t:'Exigem cooperação entre colegas.',r:'I'},{l:'b',t:'Dão oportunidade de pensar fora da caixa.',r:'E'},{l:'c',t:'São claramente definidas e permitem trabalho planejado.',r:'A'},{l:'d',t:'Permitem obter resultados rapidamente.',r:'P'}]},
+  {dim:'QUERO',text:'No fundo, gostaria que meus colegas me vissem como alguém:',opts:[{l:'a',t:'Que fosse agradável de se relacionar.',r:'I'},{l:'b',t:'Que fosse fonte confiável de informações.',r:'A'},{l:'c',t:'Que fosse fonte de ideias inovadoras.',r:'E'},{l:'d',t:'Que fosse de alta performance e entrega.',r:'P'}]},
+  {dim:'DEVO',text:'As competências mais valorizadas para execução do meu trabalho são:',opts:[{l:'a',t:'Capacidade de organização e adequação aos processos.',r:'A'},{l:'b',t:'Capacidade de atingir objetivos e metas.',r:'P'},{l:'c',t:'Capacidade de ser flexível e adaptável.',r:'E'},{l:'d',t:'Capacidade de interagir e trabalhar bem com os outros.',r:'I'}]},
+  {dim:'QUERO',text:'O que mais me agrada num trabalho é quando consigo:',opts:[{l:'a',t:'Conhecer e alcançar altos padrões de desempenho.',r:'P'},{l:'b',t:'Testar constantemente novas ideias.',r:'E'},{l:'c',t:'Trabalhar com outras pessoas de forma colaborativa.',r:'I'},{l:'d',t:'Planejar e organizar minhas atribuições.',r:'A'}]},
+  {dim:'SOU',text:'Meus colegas enxergam-me como alguém que é bom em:',opts:[{l:'a',t:'Trabalhar rapidamente.',r:'P'},{l:'b',t:'Ousar experimentar novas ideias.',r:'E'},{l:'c',t:'Contribuir para manutenção de processos e padrões.',r:'A'},{l:'d',t:'Ajudar a resolver conflitos e criar bom clima.',r:'I'}]}
+];
+
+const LABELS = { P:'Producer', A:'Administrator', E:'Entrepreneur', I:'Integrator' };
+const DESCS = {
+  P:'Focado em resultados, entrega e execução no dia a dia.',
+  A:'Organizado, sistemático e orientado a processos.',
+  E:'Inovador, criativo e com visão de futuro.',
+  I:'Integrador, colaborativo e focado em pessoas.'
+};
+const BAR_COLORS = { P:'#F59E0B', A:'#3B82F6', E:'#10B981', I:'#8B5CF6' };
+
+let answers = {}, currentQ = 0, userData = {}, allResponses = [];
+
+function show(id) {
+  ['screen-home','screen-ident','screen-quiz','screen-result','screen-dash'].forEach(s => {
+    document.getElementById(s).classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function goHome() { show('screen-home'); }
+function goIdent() { show('screen-ident'); }
+
+function startQuiz() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const tel = document.getElementById('f-tel').value.trim();
+  if (!nome || !tel) { document.getElementById('ident-err').style.display = 'block'; return; }
+  document.getElementById('ident-err').style.display = 'none';
+  userData = {
+    nome, tel,
+    empresa: document.getElementById('f-empresa').value.trim(),
+    cargo: document.getElementById('f-cargo').value.trim(),
+    email: document.getElementById('f-email').value.trim()
+  };
+  answers = {}; currentQ = 0;
+  renderQ();
+  show('screen-quiz');
+}
+
+function renderQ() {
+  const q = QUESTIONS[currentQ];
+  document.getElementById('q-counter').textContent = `Questão ${currentQ + 1} de 30`;
+  const db = document.getElementById('q-dim');
+  db.textContent = q.dim; db.className = 'dim-badge dim-' + q.dim;
+  document.getElementById('q-progress').style.width = ((currentQ + 1) / 30 * 100) + '%';
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('btn-prev').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = currentQ === 29 ? 'Ver resultado' : 'Próxima';
+
+  const container = document.getElementById('q-options');
+  container.innerHTML = '';
+  const scores = answers[currentQ] || {};
+  q.opts.forEach((opt, i) => {
+    const row = document.createElement('div');
+    row.className = 'opt-row' + (scores[i] ? ' scored' : '');
+    const scoreDiv = document.createElement('div');
+    scoreDiv.className = 'score-btns';
+    [4,3,2,1].forEach(v => {
+      const btn = document.createElement('button');
+      btn.className = 'sbtn' + (scores[i] === v ? ' active' : '');
+      btn.textContent = v;
+      btn.onclick = () => setScore(i, v);
+      scoreDiv.appendChild(btn);
+    });
+    row.innerHTML = `<span class="opt-letter">${opt.l}.</span><span class="opt-text">${opt.t}</span>`;
+    row.appendChild(scoreDiv);
+    container.appendChild(row);
+  });
+  updateTotal();
+}
+
+function setScore(optIdx, val) {
+  if (!answers[currentQ]) answers[currentQ] = {};
+  const cur = answers[currentQ];
+  Object.keys(cur).forEach(k => { if (cur[k] === val && parseInt(k) !== optIdx) delete cur[k]; });
+  cur[optIdx] = val;
+  renderQ();
+}
+
+function updateTotal() {
+  const scores = answers[currentQ] || {};
+  const vals = Object.values(scores);
+  const total = vals.reduce((a, b) => a + b, 0);
+  const unique = new Set(vals).size === vals.length;
+  const el = document.getElementById('q-total');
+  el.textContent = `Total: ${total}/10`;
+  el.className = 'total-indicator ' + (total === 10 ? (unique ? 'total-ok' : 'total-err') : 'total-err');
+}
+
+function isComplete() {
+  const scores = answers[currentQ] || {};
+  const vals = Object.values(scores);
+  return vals.length === 4 && vals.reduce((a,b) => a+b, 0) === 10 && new Set(vals).size === 4;
+}
+
+function nextQ() {
+  if (!isComplete()) { alert('Distribua os pontos 4, 3, 2 e 1 entre as 4 alternativas antes de continuar.'); return; }
+  if (currentQ < 29) { currentQ++; renderQ(); }
+  else showResult();
+}
+
+function prevQ() { if (currentQ > 0) { currentQ--; renderQ(); } }
+
+function calcScores() {
+  const dims = { SOU:{P:0,A:0,E:0,I:0}, QUERO:{P:0,A:0,E:0,I:0}, DEVO:{P:0,A:0,E:0,I:0} };
+  QUESTIONS.forEach((q, qi) => {
+    const sc = answers[qi] || {};
+    q.opts.forEach((opt, i) => { dims[q.dim][opt.r] += (sc[i] || 0); });
+  });
+  return dims;
+}
+
+function dominant(scores) { return Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0]; }
+
+async function showResult() {
+  const dims = calcScores();
+  const totals = { P:0, A:0, E:0, I:0 };
+  ['SOU','QUERO','DEVO'].forEach(d => Object.keys(totals).forEach(k => totals[k] += dims[d][k]));
+  const dom = dominant(totals);
+
+  document.getElementById('res-name').textContent = userData.nome + (userData.empresa ? ' · ' + userData.empresa : '');
+  const dl = document.getElementById('dom-letter');
+  dl.textContent = dom; dl.style.color = BAR_COLORS[dom];
+  document.getElementById('dom-full').textContent = LABELS[dom];
+  document.getElementById('dom-desc').textContent = DESCS[dom];
+
+  const dimGrid = document.getElementById('dim-grid');
+  dimGrid.innerHTML = '';
+  ['SOU','QUERO','DEVO'].forEach(d => {
+    const dd = dims[d];
+    const maxv = Math.max(...Object.values(dd));
+    const div = document.createElement('div');
+    div.className = 'dim-card';
+    div.innerHTML = `<div class="dc-title">${d}</div>` +
+      ['P','A','E','I'].map(k => `
+        <div class="bar-row">
+          <span class="bar-lbl" style="color:${BAR_COLORS[k]}">${k}</span>
+          <div class="bar-bg"><div class="bar-fill" style="width:${Math.round(dd[k]/maxv*100)}%;background:${BAR_COLORS[k]}"></div></div>
+          <span class="bar-val">${dd[k]}</span>
+        </div>`).join('');
+    dimGrid.appendChild(div);
+  });
+
+  const rows = document.getElementById('analysis-rows');
+  rows.innerHTML = '';
+  ['P','A','E','I'].forEach(k => {
+    const sou = dims.SOU[k], quero = dims.QUERO[k], devo = dims.DEVO[k];
+    const gap = Math.max(sou, quero, devo) - Math.min(sou, quero, devo);
+    const avg = totals[k] / 3;
+    const acao = gap >= 5 ? 'Ciente' : (avg >= 28 ? 'Diminuir' : (avg <= 20 ? 'Aumentar' : 'Manter'));
+    const tagClass = { Ciente:'tag-ciente', Manter:'tag-manter', Aumentar:'tag-aumentar', Diminuir:'tag-diminuir' }[acao];
+    const div = document.createElement('div');
+    div.className = 'analysis-row';
+    div.innerHTML = `
+      <div><strong>${k}</strong> <span style="font-size:11px;color:var(--text-3)">${LABELS[k]}</span></div>
+      <div>${sou}</div><div>${quero}</div><div>${devo}</div>
+      <div class="${gap >= 5 ? 'gap-warn' : ''}">${gap}</div>
+      <div><span class="tag ${tagClass}">${acao}</span></div>`;
+    rows.appendChild(div);
+  });
+
+  const resp = { ...userData, dims, totals, dom, date: new Date().toLocaleDateString('pt-BR') };
+  if (window._saveResponse) await window._saveResponse(resp);
+  show('screen-result');
+}
+
+async function showDash() {
+  show('screen-dash');
+  document.getElementById('resp-list').innerHTML = '<div class="loading">Carregando...</div>';
+  if (window._loadResponses) {
+    allResponses = await window._loadResponses();
+  }
+  const n = allResponses.length;
+  document.getElementById('dash-count').textContent = n === 0 ? 'Nenhum respondente ainda' : `${n} respondente${n !== 1 ? 's' : ''}`;
+  renderList(allResponses);
+  renderEmpresa();
+}
+
+function filterList(q) {
+  const f = q.toLowerCase();
+  renderList(allResponses.filter(r =>
+    (r.nome||'').toLowerCase().includes(f) ||
+    (r.empresa||'').toLowerCase().includes(f) ||
+    (r.cargo||'').toLowerCase().includes(f)
+  ));
+}
+
+function renderList(list) {
+  const el = document.getElementById('resp-list');
+  if (!list.length) { el.innerHTML = '<div class="empty">Nenhum resultado encontrado.</div>'; return; }
+  el.innerHTML = list.map(r => {
+    const dom = r.dom || '?';
+    const gaps = ['P','A','E','I'].filter(k => {
+      if (!r.dims) return false;
+      const vals = [r.dims.SOU[k], r.dims.QUERO[k], r.dims.DEVO[k]];
+      return Math.max(...vals) - Math.min(...vals) >= 5;
+    });
+    return `<div class="resp-card">
+      <div class="resp-top">
+        <div><div class="resp-name">${r.nome}</div><div class="resp-meta">${[r.cargo,r.empresa,r.date].filter(Boolean).join(' · ')}</div></div>
+        <span class="rbadge rb-${dom} rb-dom">${dom} · ${LABELS[dom]||''}</span>
+      </div>
+      <div class="resp-badges">
+        ${['P','A','E','I'].map(k => `<span class="rbadge rb-${k}">${k}: ${r.totals?r.totals[k]:'-'}</span>`).join('')}
+        ${gaps.map(k => `<span class="rbadge rb-gap">Gap ${k}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderEmpresa() {
+  const el = document.getElementById('empresa-list');
+  const map = {};
+  allResponses.forEach(r => { const e = r.empresa || '(sem empresa)'; if (!map[e]) map[e] = []; map[e].push(r); });
+  if (!Object.keys(map).length) { el.innerHTML = '<div class="empty">Nenhum dado ainda.</div>'; return; }
+  el.innerHTML = Object.entries(map).map(([emp, people]) => {
+    const doms = { P:0,A:0,E:0,I:0 };
+    people.forEach(p => { if (p.dom) doms[p.dom]++; });
+    const domEmp = Object.entries(doms).sort((a,b) => b[1]-a[1])[0][0];
+    return `<div class="resp-card">
+      <div class="resp-top">
+        <div><div class="resp-name">${emp}</div><div class="resp-meta">${people.length} respondente${people.length!==1?'s':''}</div></div>
+        <span class="rbadge rb-${domEmp} rb-dom">Perfil: ${domEmp}</span>
+      </div>
+      <div class="resp-badges">
+        ${people.map(p => `<span class="rbadge rb-${p.dom||'?'}">${p.nome} · ${p.dom||'?'}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let charts = {};
+function renderCharts() {
+  const doms = { P:0,A:0,E:0,I:0 };
+  const avg = { P:{SOU:0,QUERO:0,DEVO:0}, A:{SOU:0,QUERO:0,DEVO:0}, E:{SOU:0,QUERO:0,DEVO:0}, I:{SOU:0,QUERO:0,DEVO:0} };
+  const n = allResponses.length || 1;
+  allResponses.forEach(r => {
+    if (r.dom) doms[r.dom]++;
+    if (r.dims) ['P','A','E','I'].forEach(k => ['SOU','QUERO','DEVO'].forEach(d => { avg[k][d] += r.dims[d][k] / n; }));
+  });
+
+  if (charts.dist) charts.dist.destroy();
+  if (charts.avg) charts.avg.destroy();
+
+  charts.dist = new Chart(document.getElementById('chartDist'), {
+    type: 'bar',
+    data: {
+      labels: ['P · Producer','A · Administrator','E · Entrepreneur','I · Integrator'],
+      datasets: [{ label: 'Respondentes', data: [doms.P,doms.A,doms.E,doms.I], backgroundColor: ['#F59E0B','#3B82F6','#10B981','#8B5CF6'], borderRadius: 6 }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{ticks:{stepSize:1}, beginAtZero:true} } }
+  });
+
+  charts.avg = new Chart(document.getElementById('chartAvg'), {
+    type: 'bar',
+    data: {
+      labels: ['P','A','E','I'],
+      datasets: [
+        { label:'SOU', data:['P','A','E','I'].map(k => Math.round(avg[k].SOU)), backgroundColor:'#FEF3C7', borderColor:'#F59E0B', borderWidth:2 },
+        { label:'QUERO', data:['P','A','E','I'].map(k => Math.round(avg[k].QUERO)), backgroundColor:'#DBEAFE', borderColor:'#3B82F6', borderWidth:2 },
+        { label:'DEVO', data:['P','A','E','I'].map(k => Math.round(avg[k].DEVO)), backgroundColor:'#D1FAE5', borderColor:'#10B981', borderWidth:2 }
+      ]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,position:'top'} }, scales:{ y:{beginAtZero:true} } }
+  });
+}
+
+function switchTab(name) {
+  ['lista','empresa','graficos'].forEach((t, i) => {
+    document.getElementById('tab-'+t).classList.toggle('hidden', t !== name);
+    document.querySelectorAll('.tab')[i].classList.toggle('active', t === name);
+  });
+  if (name === 'graficos') setTimeout(renderCharts, 50);
+}
+</script>
+</body>
+</html>
